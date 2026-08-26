@@ -19,6 +19,7 @@
   var all = [];
   var pool = [];
   var division = "all";
+  var mode = "name";        // "name": portrait -> four names. "face": name -> four portraits.
   var rounds = [];
   var index = 0;
   var score = 0;
@@ -97,36 +98,68 @@
 
   /* ---------- one round ---------- */
 
+  /** A portrait cropped to head and shoulders, with this wrestler's own zoom. */
+  function croppedPortrait(rikishi, alt) {
+    var img = document.createElement("img");
+    // Some wrestlers wear their shikona high on the mawashi; show less of them.
+    img.style.setProperty("--portrait-zoom", rikishi.portraitZoom || 1);
+    img.src = rikishi.image;
+    img.alt = alt || "";
+    img.decoding = "async";
+    return img;
+  }
+
+  function choiceButton(option, i, extraClass) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice" + (extraClass ? " " + extraClass : "");
+    button.dataset.id = option.id;
+
+    var num = document.createElement("span");
+    num.className = "choice__num";
+    num.textContent = i + 1;
+    button.appendChild(num);
+
+    button.addEventListener("click", function () { choose(option, button); });
+    return button;
+  }
+
   function renderRound() {
     var round = rounds[index];
-    var lang = I18N.lang;
     answered = false;
 
     el.roundNow.textContent = index + 1;
     el.scoreNow.textContent = score;
     paintTawara();
-
     el.verdict.hidden = true;
+
+    el.promptPortrait.hidden = mode !== "name";
+    el.promptName.hidden = mode !== "face";
+    el.choices.classList.toggle("choices--faces", mode === "face");
+    el.choices.innerHTML = "";
+
+    if (mode === "name") renderNameRound(round);
+    else renderFaceRound(round);
+
+    // Warm the next round's images so the reveal is instant.
+    var next = rounds[index + 1];
+    if (next) (mode === "name" ? [next.answer] : next.options).forEach(function (r) {
+      new Image().src = r.image;
+    });
+  }
+
+  /** Portrait up top, four names to choose from. */
+  function renderNameRound(round) {
+    var lang = I18N.lang;
+
     el.portraitFrame.classList.remove("is-shown");
     el.portraitImg.alt = "";
-    // Some wrestlers wear their shikona high on the mawashi; show less of them.
     el.portraitImg.style.setProperty("--portrait-zoom", round.answer.portraitZoom || 1);
     el.portraitImg.src = round.answer.image;
     if (el.portraitImg.complete) revealPortrait();
 
-    // Warm the next portrait so the reveal is instant.
-    if (rounds[index + 1]) new Image().src = rounds[index + 1].answer.image;
-
-    el.choices.innerHTML = "";
     round.options.forEach(function (option, i) {
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "choice";
-      button.dataset.id = option.id;
-
-      var num = document.createElement("span");
-      num.className = "choice__num";
-      num.textContent = i + 1;
+      var button = choiceButton(option, i);
 
       var main = document.createElement("span");
       main.className = "choice__main";
@@ -136,10 +169,29 @@
       sub.className = "choice__sub";
       sub.textContent = SumoData.subNameOf(option, lang);
 
-      button.append(num, main, sub);
-      button.addEventListener("click", function () { choose(option, button); });
+      button.append(main, sub);
       el.choices.appendChild(button);
     });
+  }
+
+  /** Name up top, four portraits to choose from. */
+  function renderFaceRound(round) {
+    paintNamePrompt(round.answer);
+
+    round.options.forEach(function (option, i) {
+      var button = choiceButton(option, i, "choice--face");
+      var window_ = document.createElement("span");
+      window_.className = "choice__window portrait-crop";
+      window_.appendChild(croppedPortrait(option));
+      button.appendChild(window_);
+      el.choices.appendChild(button);
+    });
+  }
+
+  function paintNamePrompt(rikishi) {
+    var lang = I18N.lang;
+    el.promptNameMain.textContent = SumoData.nameOf(rikishi, lang);
+    el.promptNameSub.textContent = SumoData.subNameOf(rikishi, lang);
   }
 
   function revealPortrait() {
@@ -175,8 +227,10 @@
     el.verdictText.textContent = "";
     var lead = document.createElement("b");
     lead.textContent = SumoData.nameOf(answer, lang);
+    // In guess-the-face the name is already the prompt, so naming it again reads oddly.
+    var prefix = !correct && mode === "name" ? I18N.t("answerIs") + " " : "";
     el.verdictText.append(
-      correct ? "" : I18N.t("answerIs") + " ",
+      prefix,
       lead,
       " — " + I18N.tf(
         "andHe",
@@ -282,6 +336,16 @@
     });
     el.portraitImg.addEventListener("load", revealPortrait);
 
+    el.modePicker.addEventListener("click", function (event) {
+      var button = event.target.closest(".segmented__btn");
+      if (!button) return;
+      mode = button.dataset.mode;
+      el.modePicker.querySelectorAll(".segmented__btn").forEach(function (node) {
+        node.classList.toggle("is-active", node === button);
+      });
+      paintModeNote();
+    });
+
     el.divisionPicker.addEventListener("click", function (event) {
       var button = event.target.closest(".segmented__btn");
       if (!button) return;
@@ -307,6 +371,7 @@
 
     // Re-render in place when the language flips mid-game.
     I18N.onChange(function () {
+      paintModeNote();
       if ($("screenQuiz").classList.contains("is-active")) {
         var round = rounds[index];
         if (answered) {
@@ -323,27 +388,39 @@
   /** Re-label an already-answered round without discarding its verdict. */
   function renderRoundTranslated(round) {
     var lang = I18N.lang;
-    el.choices.querySelectorAll(".choice").forEach(function (node) {
-      var option = round.options.find(function (o) { return o.id === node.dataset.id; });
-      if (!option) return;
-      node.querySelector(".choice__main").textContent = SumoData.nameOf(option, lang);
-      node.querySelector(".choice__sub").textContent = SumoData.subNameOf(option, lang);
-    });
+    if (mode === "face") {
+      paintNamePrompt(round.answer);          // the portraits themselves need no relabelling
+    } else {
+      el.choices.querySelectorAll(".choice").forEach(function (node) {
+        var option = round.options.find(function (o) { return o.id === node.dataset.id; });
+        if (!option) return;
+        node.querySelector(".choice__main").textContent = SumoData.nameOf(option, lang);
+        node.querySelector(".choice__sub").textContent = SumoData.subNameOf(option, lang);
+      });
+    }
     showVerdict(round.chosen.id === round.answer.id, round.answer);
+  }
+
+  function paintModeNote() {
+    el.modeNote.textContent = I18N.t(mode === "face" ? "modeNoteFace" : "modeNoteName");
   }
 
   function init() {
     I18N.init();
     SumoCard.init();
-    ["poolCount", "startBtn", "divisionPicker", "tawara", "roundNow", "roundTotal",
-     "scoreNow", "portraitImg", "choices", "verdict", "verdictMark", "verdictText",
-     "nextBtn", "finalScore", "rankJa", "rankEn", "resultLine", "review", "againBtn",
-     "loading"].forEach(function (id) { el[id] = $(id); });
+    ["poolCount", "startBtn", "modePicker", "modeNote", "divisionPicker", "tawara",
+     "roundNow", "roundTotal", "scoreNow", "promptPortrait", "portraitImg",
+     "promptName", "promptNameMain", "promptNameSub", "choices", "verdict",
+     "verdictMark", "verdictText", "nextBtn", "finalScore", "rankJa", "rankEn",
+     "resultLine", "review", "againBtn", "loading"].forEach(function (id) {
+      el[id] = $(id);
+    });
     el.portraitFrame = document.querySelector(".portrait__frame");
 
     SumoData.load().then(function (wrestlers) {
       all = wrestlers;
       applyDivision();
+      paintModeNote();
       el.loading.hidden = true;
       bind();
     }).catch(function (error) {

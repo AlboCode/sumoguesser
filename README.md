@@ -1,8 +1,8 @@
 # 相撲当て — Sumo Guesser
 
-A quiz that shows you an official portrait of a sumo wrestler and asks you to name
-him. Ten bouts, four choices each, and a banzuke rank at the end — hit all ten and
-the sakura petals fall.
+A quiz that pairs sumo wrestlers with their faces, in either direction: name the
+rikishi in the portrait, or pick the portrait that matches the name. Ten bouts, four
+choices each, and a banzuke rank at the end — hit all ten and the sakura petals fall.
 
 The whole thing is static HTML, CSS and vanilla JavaScript: no build step, no
 dependencies, no framework.
@@ -10,10 +10,15 @@ dependencies, no framework.
 ## What's in it
 
 **The quiz** (`index.html`) — ten rikishi drawn at random from the current banzuke,
-four names per portrait. You can restrict the draw to makuuchi or juryo. Keys `1`–`4`
-answer and `Enter` advances, if you'd rather not reach for the mouse. A perfect 10
-sets off a canvas confetti shower of sakura petals, gold leaf and vermillion
-streamers. Afterwards, every bout in the tally opens that wrestler's card.
+and two ways to play them:
+
+- **Guess the name** — a portrait, and four names to choose from.
+- **Guess the face** — a name, and four portraits to choose from.
+
+You can restrict the draw to makuuchi or juryo. Keys `1`–`4` answer and `Enter`
+advances, in either mode. A perfect 10 sets off a canvas confetti shower of sakura
+petals, gold leaf and vermillion streamers. Afterwards, every bout in the tally opens
+that wrestler's card.
 
 Only the top of each portrait is shown while you're guessing — see
 [Keeping the answer out of frame](#keeping-the-answer-out-of-frame).
@@ -51,7 +56,8 @@ problem for a guessing game: on some wrestlers it carries their own shikona in
 embroidery. Tobizaru wears 翔猿 across the front of his.
 
 So the quiz shows only the top 44% of the frame — face and torso, stopping above
-every apron in the current set. A handful of wrestlers wear their name higher than
+every apron in the current set. This applies to the four portraits in guess-the-face
+just as much as to the single one in guess-the-name; both are being asked about. A handful of wrestlers wear their name higher than
 that; those get an entry in `PORTRAIT_ZOOM` in `scrape.py`, which tightens the slice
 for them alone. The on-screen frame stays exactly the same size either way, so a
 tighter crop is never itself a hint. The directory is unaffected and shows each

@@ -246,6 +246,12 @@ body {
 .chip b { color: var(--shu); font-size: 1rem; }
 
 .field { margin-bottom: 1.7rem; }
+.field__note {
+  margin: .55rem 0 0;
+  font-size: .8rem;
+  color: var(--sumi-faint);
+}
+
 .field__label {
   display: block;
   font-size: .74rem;
@@ -385,17 +391,16 @@ body {
    the top 44% of the frame; a per-wrestler --portrait-zoom (from the data, see
    PORTRAIT_ZOOM in scripts/scrape.py) tightens that for the few who wear their
    name higher. The window itself never changes size, so a tighter crop is not
-   itself a tell. */
-.portrait__window {
-  width: 100%;
-  max-width: 300px;
+   itself a tell. Used by the quiz portrait and by the face choices alike — both
+   are asked about, so both must keep the name hidden. */
+.portrait-crop {
   aspect-ratio: 270 / 209;
   overflow: hidden;
   border-radius: 2px;
   background: #fff;
 }
 
-.portrait__window img {
+.portrait-crop img {
   display: block;
   width: 100%;
   height: 100%;
@@ -404,6 +409,8 @@ body {
   transform: scale(var(--portrait-zoom, 1));
   transform-origin: top center;
 }
+
+.portrait__window { width: 100%; max-width: 300px; }
 
 .portrait__veil {
   position: absolute;
@@ -421,6 +428,37 @@ body {
   font-size: .8rem;
   letter-spacing: .18em;
   color: var(--sumi-faint);
+}
+
+/* ============================================================
+   Name prompt (guess-the-face)
+   ============================================================ */
+
+.name-prompt {
+  text-align: center;
+  margin: .3rem 0 1.1rem;
+  padding: .9rem 1rem 1rem;
+  background: var(--washi-lit);
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--r-sm);
+}
+.name-prompt__kicker {
+  margin: 0 0 .5rem;
+  font-size: .74rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--sumi-faint);
+}
+.name-prompt__main {
+  margin: 0;
+  font-family: var(--brush);
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  line-height: 1.2;
+}
+.name-prompt__sub {
+  margin: .2rem 0 0;
+  font-size: .95rem;
+  color: var(--sumi-soft);
 }
 
 /* ============================================================
@@ -479,6 +517,21 @@ body {
 }
 .choice.is-wrong .choice__num { border-color: var(--shu); color: var(--shu); }
 .choice.is-dim { opacity: .48; }
+
+/* Four portraits instead of four names. */
+.choices--faces { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.choice--face {
+  padding: .45rem .45rem .55rem;
+  min-height: 0;
+  align-items: center;
+}
+.choice--face .choice__num {
+  position: static;
+  transform: none;
+  margin-bottom: .4rem;
+}
+.choice__window { width: 100%; max-width: 240px; }
 
 /* ============================================================
    Verdict
@@ -871,6 +924,7 @@ body {
   .stage { padding: 1.8rem .9rem 3rem; }
   .scroll-card { padding: 1.6rem 1.1rem; }
   .choices { grid-template-columns: 1fr; }
+  .choices--faces { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; }
   .roster { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
   .sheet__body { padding: 1.4rem 1.1rem; }
   .detail__img { width: 130px; margin: 0 auto; }

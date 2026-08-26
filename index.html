@@ -40,14 +40,23 @@
   <!-- ============ TITLE SCREEN ============ -->
   <section class="screen is-active" id="screenStart">
     <div class="scroll-card scroll-card--hero">
-      <p class="kicker" data-i18n="heroKicker">Ten portraits. Four names each.</p>
+      <p class="kicker" data-i18n="heroKicker">Ten bouts. Four choices each.</p>
       <h1 class="hero__title" data-i18n="heroTitle">Who is this rikishi?</h1>
-      <p class="hero__lede" data-i18n="heroLede">Ten wrestlers are drawn at random from the current banzuke. Name each one from their official portrait and earn your rank.</p>
+      <p class="hero__lede" data-i18n="heroLede">Ten wrestlers are drawn at random from the current banzuke. Put a name to each portrait — or a portrait to each name — and earn your rank.</p>
 
       <div class="hero__meta">
         <span class="chip"><b id="poolCount">70</b> <span data-i18n="chipPool">rikishi in the pool</span></span>
         <span class="chip"><b>10</b> <span data-i18n="chipRounds">rounds</span></span>
         <span class="chip"><b>4</b> <span data-i18n="chipChoices">choices</span></span>
+      </div>
+
+      <div class="field">
+        <span class="field__label" data-i18n="modeLabel">Which way round</span>
+        <div class="segmented" id="modePicker" role="group">
+          <button type="button" class="segmented__btn is-active" data-mode="name" data-i18n="modeName">Guess the name</button>
+          <button type="button" class="segmented__btn" data-mode="face" data-i18n="modeFace">Guess the face</button>
+        </div>
+        <p class="field__note" id="modeNote" data-i18n="modeNoteName">A portrait, and four names to choose from.</p>
       </div>
 
       <div class="field">
@@ -76,15 +85,23 @@
     </div>
 
     <div class="scroll-card scroll-card--quiz">
-      <figure class="portrait">
+      <!-- Guess-the-name: one portrait, four names below -->
+      <figure class="portrait" id="promptPortrait">
         <div class="portrait__frame">
-          <div class="portrait__window">
+          <div class="portrait__window portrait-crop">
             <img id="portraitImg" alt="" width="270" height="209" decoding="async">
           </div>
           <div class="portrait__veil" id="portraitVeil" aria-hidden="true"></div>
         </div>
-        <figcaption class="portrait__cap" id="portraitCap" data-i18n="portraitCap">Name this rikishi</figcaption>
+        <figcaption class="portrait__cap" data-i18n="portraitCap">Name this rikishi</figcaption>
       </figure>
+
+      <!-- Guess-the-face: one name, four portraits below -->
+      <div class="name-prompt" id="promptName" hidden>
+        <p class="name-prompt__kicker" data-i18n="promptWhich">Which of these is</p>
+        <p class="name-prompt__main" id="promptNameMain"></p>
+        <p class="name-prompt__sub" id="promptNameSub"></p>
+      </div>
 
       <div class="choices" id="choices" role="group"></div>
 
