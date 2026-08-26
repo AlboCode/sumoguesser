@@ -379,11 +379,16 @@ body {
   pointer-events: none;
 }
 
+/* Head and shoulders only. Lower down, the kesho-mawashi carries the wrestler's
+   own shikona in embroidery, which would hand over the answer. 44% of the frame
+   keeps the face and torso and stops above every apron in the set. */
 .portrait__frame img {
   display: block;
   width: 100%;
-  max-width: 250px;
-  height: auto;
+  max-width: 300px;
+  aspect-ratio: 270 / 209;
+  object-fit: cover;
+  object-position: top center;
   background: #fff;
   border-radius: 2px;
 }
