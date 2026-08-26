@@ -78,7 +78,9 @@
     <div class="scroll-card scroll-card--quiz">
       <figure class="portrait">
         <div class="portrait__frame">
-          <img id="portraitImg" alt="" width="270" height="209" decoding="async">
+          <div class="portrait__window">
+            <img id="portraitImg" alt="" width="270" height="209" decoding="async">
+          </div>
           <div class="portrait__veil" id="portraitVeil" aria-hidden="true"></div>
         </div>
         <figcaption class="portrait__cap" id="portraitCap" data-i18n="portraitCap">Name this rikishi</figcaption>
@@ -109,6 +111,7 @@
       <p class="result__line" id="resultLine"></p>
 
       <h2 class="section-title" data-i18n="reviewTitle">Your bouts</h2>
+      <p class="review__hint" data-i18n="reviewHint">Tap a bout to see the rikishi's card.</p>
       <ul class="review" id="review"></ul>
 
       <div class="result__actions">
@@ -121,6 +124,15 @@
   <p class="loading" id="loading" data-i18n="loading">Unrolling the banzuke…</p>
 </main>
 
+<!-- ============ RIKISHI CARD ============ -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__scrim" id="sheetScrim"></div>
+  <article class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetName">
+    <button type="button" class="sheet__close" id="sheetClose" aria-label="Close">×</button>
+    <div class="sheet__body" id="sheetBody"></div>
+  </article>
+</div>
+
 <footer class="footer">
   <p data-i18n="footerCredit">Portraits &amp; profile data: Japan Sumo Association</p>
   <p><a href="https://www.sumo.or.jp/" rel="noopener" target="_blank">www.sumo.or.jp</a></p>
@@ -130,6 +142,7 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/data.js"></script>
+<script src="js/card.js"></script>
 <script src="js/confetti.js"></script>
 <script src="js/quiz.js"></script>
 </body>

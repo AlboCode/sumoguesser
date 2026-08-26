@@ -363,6 +363,7 @@ body {
 .portrait__frame {
   position: relative;
   display: inline-block;
+  font-size: 0;
   padding: 10px;
   background: var(--washi-lit);
   border: 1px solid var(--paper-edge);
@@ -380,17 +381,28 @@ body {
 }
 
 /* Head and shoulders only. Lower down, the kesho-mawashi carries the wrestler's
-   own shikona in embroidery, which would hand over the answer. 44% of the frame
-   keeps the face and torso and stops above every apron in the set. */
-.portrait__frame img {
-  display: block;
+   own shikona in embroidery, which would hand over the answer. The window shows
+   the top 44% of the frame; a per-wrestler --portrait-zoom (from the data, see
+   PORTRAIT_ZOOM in scripts/scrape.py) tightens that for the few who wear their
+   name higher. The window itself never changes size, so a tighter crop is not
+   itself a tell. */
+.portrait__window {
   width: 100%;
   max-width: 300px;
   aspect-ratio: 270 / 209;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #fff;
+}
+
+.portrait__window img {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: top center;
-  background: #fff;
-  border-radius: 2px;
+  transform: scale(var(--portrait-zoom, 1));
+  transform-origin: top center;
 }
 
 .portrait__veil {
@@ -558,16 +570,42 @@ body {
   text-align: left;
 }
 
+.review__hint {
+  margin: -.4rem 0 .6rem;
+  font-size: .78rem;
+  color: var(--sumi-faint);
+  text-align: left;
+}
+
 .review { list-style: none; margin: 0 0 2rem; padding: 0; text-align: left; }
-.review li {
+.review li { border-bottom: 1px dotted var(--paper-edge); }
+.review li:last-child { border-bottom: 0; }
+
+.review__row {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: .8rem;
-  padding: .5rem 0;
-  border-bottom: 1px dotted var(--paper-edge);
+  padding: .5rem .5rem .5rem 0;
+  font-family: var(--mincho);
   font-size: .92rem;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background .16s;
 }
-.review li:last-child { border-bottom: 0; }
+.review__row:hover { background: rgba(35,64,94,.07); }
+.review__row:hover .review__open { color: var(--shu); transform: translateX(2px); }
+
+.review__open {
+  flex: none;
+  color: var(--sumi-faint);
+  font-size: 1.1rem;
+  transition: color .16s, transform .16s;
+}
 .review__thumb {
   width: 34px; height: 46px;
   object-fit: cover;

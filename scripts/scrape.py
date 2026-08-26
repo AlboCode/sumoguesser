@@ -32,6 +32,14 @@ DATA_FILE = os.path.join(ROOT, "data", "rikishi.json")
 
 DIVISIONS = [(1, "Makuuchi", "幕内"), (2, "Juryo", "十両")]
 
+# The quiz shows only the top of each portrait, so the kesho-mawashi below —
+# which on some wrestlers carries their own shikona in embroidery — stays hidden.
+# A few need a tighter slice than the default; scripts/audit_crops.py renders the
+# contact sheets to re-check this after a banzuke refresh.
+PORTRAIT_ZOOM = {
+    "3594": 1.45,  # Tobizaru — 翔猿 is printed across the front of his mawashi
+}
+
 # Award images on the profile page, keyed by the gif basename.
 AWARDS = [
     ("prize01", "Makuuchi Championships", "幕内優勝"),
@@ -199,6 +207,7 @@ def main():
                 "debutJa": jf.get("初土俵", ""),
                 "awards": en["awards"],
                 "image": "assets/rikishi/%s.jpg" % rid,
+                "portraitZoom": PORTRAIT_ZOOM.get(rid, 1),
                 "profileUrl": PROFILE_EN % rid,
                 "profileUrlJa": PROFILE_JA % rid,
             })

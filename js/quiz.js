@@ -109,6 +109,8 @@
     el.verdict.hidden = true;
     el.portraitFrame.classList.remove("is-shown");
     el.portraitImg.alt = "";
+    // Some wrestlers wear their shikona high on the mawashi; show less of them.
+    el.portraitImg.style.setProperty("--portrait-zoom", round.answer.portraitZoom || 1);
     el.portraitImg.src = round.answer.image;
     if (el.portraitImg.complete) revealPortrait();
 
@@ -227,6 +229,9 @@
     rounds.forEach(function (round) {
       var correct = round.chosen && round.chosen.id === round.answer.id;
       var item = document.createElement("li");
+      var row = document.createElement("button");
+      row.type = "button";
+      row.className = "review__row";
 
       var thumb = document.createElement("img");
       thumb.className = "review__thumb";
@@ -253,7 +258,14 @@
       mark.className = "review__mark " + (correct ? "is-right" : "is-wrong");
       mark.textContent = correct ? "◯" : "✕";
 
-      item.append(thumb, name, mark);
+      var open = document.createElement("span");
+      open.className = "review__open";
+      open.textContent = "›";
+      open.setAttribute("aria-hidden", "true");
+
+      row.append(thumb, name, mark, open);
+      row.addEventListener("click", function () { SumoCard.open(round.answer, row); });
+      item.appendChild(row);
       el.review.appendChild(item);
     });
   }
@@ -322,6 +334,7 @@
 
   function init() {
     I18N.init();
+    SumoCard.init();
     ["poolCount", "startBtn", "divisionPicker", "tawara", "roundNow", "roundTotal",
      "scoreNow", "portraitImg", "choices", "verdict", "verdictMark", "verdictText",
      "nextBtn", "finalScore", "rankJa", "rankEn", "resultLine", "review", "againBtn",
