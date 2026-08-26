@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>相撲当て — Sumo Guesser</title>
+<meta name="description" content="Guess the sumo wrestler from their portrait. Ten rounds, four choices, one banzuke rank at the end.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🇯🇵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Shippori+Mincho+B1:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="paper-grain" aria-hidden="true"></div>
+
+<header class="noren">
+  <div class="noren__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__seal" aria-hidden="true">相撲</span>
+      <span class="brand__text">
+        <span class="brand__ja" data-i18n="brandJa">相撲当て</span>
+        <span class="brand__en" data-i18n="brandEn">SUMO GUESSER</span>
+      </span>
+    </a>
+    <nav class="nav">
+      <a class="nav__link is-current" href="index.html" data-i18n="navQuiz">Quiz</a>
+      <a class="nav__link" href="rikishi.html" data-i18n="navExplore">Rikishi</a>
+      <button type="button" class="lang-toggle" id="langToggle" aria-label="Switch language">
+        <span class="lang-toggle__opt" data-lang="ja">日本語</span>
+        <span class="lang-toggle__opt" data-lang="en">EN</span>
+      </button>
+    </nav>
+  </div>
+  <div class="noren__fringe" aria-hidden="true"></div>
+</header>
+
+<main class="stage">
+
+  <!-- ============ TITLE SCREEN ============ -->
+  <section class="screen is-active" id="screenStart">
+    <div class="scroll-card scroll-card--hero">
+      <p class="kicker" data-i18n="heroKicker">Ten portraits. Four names each.</p>
+      <h1 class="hero__title" data-i18n="heroTitle">Who is this rikishi?</h1>
+      <p class="hero__lede" data-i18n="heroLede">Ten wrestlers are drawn at random from the current banzuke. Name each one from their official portrait and earn your rank.</p>
+
+      <div class="hero__meta">
+        <span class="chip"><b id="poolCount">70</b> <span data-i18n="chipPool">rikishi in the pool</span></span>
+        <span class="chip"><b>10</b> <span data-i18n="chipRounds">rounds</span></span>
+        <span class="chip"><b>4</b> <span data-i18n="chipChoices">choices</span></span>
+      </div>
+
+      <div class="field">
+        <span class="field__label" data-i18n="divisionLabel">Division</span>
+        <div class="segmented" id="divisionPicker" role="group">
+          <button type="button" class="segmented__btn is-active" data-division="all" data-i18n="divAll">All sekitori</button>
+          <button type="button" class="segmented__btn" data-division="Makuuchi" data-i18n="divMakuuchi">Makuuchi</button>
+          <button type="button" class="segmented__btn" data-division="Juryo" data-i18n="divJuryo">Juryo</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn--primary btn--lg" id="startBtn" data-i18n="startBtn">Enter the ring</button>
+      <p class="hero__note" data-i18n="heroNote">Portraits and data come from the Japan Sumo Association official site.</p>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ SCREEN ============ -->
+  <section class="screen" id="screenQuiz">
+    <div class="quiz-head">
+      <ol class="tawara" id="tawara" aria-label="Progress"></ol>
+      <p class="quiz-head__count">
+        <span data-i18n="roundWord">Bout</span>
+        <b id="roundNow">1</b><span class="sep">/</span><span id="roundTotal">10</span>
+        <span class="quiz-head__score"><span data-i18n="scoreWord">Wins</span> <b id="scoreNow">0</b></span>
+      </p>
+    </div>
+
+    <div class="scroll-card scroll-card--quiz">
+      <figure class="portrait">
+        <div class="portrait__frame">
+          <img id="portraitImg" alt="" width="270" height="474" decoding="async">
+          <div class="portrait__veil" id="portraitVeil" aria-hidden="true"></div>
+        </div>
+        <figcaption class="portrait__cap" id="portraitCap" data-i18n="portraitCap">Name this rikishi</figcaption>
+      </figure>
+
+      <div class="choices" id="choices" role="group"></div>
+
+      <div class="verdict" id="verdict" hidden>
+        <p class="verdict__mark" id="verdictMark"></p>
+        <p class="verdict__text" id="verdictText"></p>
+        <button type="button" class="btn btn--primary" id="nextBtn" data-i18n="nextBtn">Next bout</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <section class="screen" id="screenResult">
+    <div class="scroll-card scroll-card--result">
+      <p class="kicker" data-i18n="resultKicker">Final tally</p>
+      <div class="tally">
+        <span class="tally__score" id="finalScore">0</span>
+        <span class="tally__of" data-i18n="tallyOf">out of 10</span>
+      </div>
+      <div class="rank-seal" id="rankSeal">
+        <span class="rank-seal__ja" id="rankJa">序ノ口</span>
+        <span class="rank-seal__en" id="rankEn">Jonokuchi</span>
+      </div>
+      <p class="result__line" id="resultLine"></p>
+
+      <h2 class="section-title" data-i18n="reviewTitle">Your bouts</h2>
+      <ul class="review" id="review"></ul>
+
+      <div class="result__actions">
+        <button type="button" class="btn btn--primary" id="againBtn" data-i18n="againBtn">Another basho</button>
+        <a class="btn" href="rikishi.html" data-i18n="studyBtn">Study the rikishi</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="loading" id="loading" data-i18n="loading">Unrolling the banzuke…</p>
+</main>
+
+<footer class="footer">
+  <p data-i18n="footerCredit">Portraits &amp; profile data: Japan Sumo Association</p>
+  <p><a href="https://www.sumo.or.jp/" rel="noopener" target="_blank">www.sumo.or.jp</a></p>
+</footer>
+
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/confetti.js"></script>
+<script src="js/quiz.js"></script>
+</body>
+</html>

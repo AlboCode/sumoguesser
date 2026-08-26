@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>力士名鑑 — Rikishi Directory</title>
+<meta name="description" content="Browse every sekitori on the current banzuke: rank, stable, birthplace, signature techniques and honours.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🇯🇵</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yuji+Syuku&family=Shippori+Mincho+B1:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="paper-grain" aria-hidden="true"></div>
+
+<header class="noren">
+  <div class="noren__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__seal" aria-hidden="true">相撲</span>
+      <span class="brand__text">
+        <span class="brand__ja" data-i18n="brandJa">相撲当て</span>
+        <span class="brand__en" data-i18n="brandEn">SUMO GUESSER</span>
+      </span>
+    </a>
+    <nav class="nav">
+      <a class="nav__link" href="index.html" data-i18n="navQuiz">Quiz</a>
+      <a class="nav__link is-current" href="rikishi.html" data-i18n="navExplore">Rikishi</a>
+      <button type="button" class="lang-toggle" id="langToggle" aria-label="Switch language">
+        <span class="lang-toggle__opt" data-lang="ja">日本語</span>
+        <span class="lang-toggle__opt" data-lang="en">EN</span>
+      </button>
+    </nav>
+  </div>
+  <div class="noren__fringe" aria-hidden="true"></div>
+</header>
+
+<main class="stage stage--wide">
+  <div class="page-head">
+    <h1 class="page-head__title" data-i18n="dirTitle">Rikishi directory</h1>
+    <p class="page-head__lede" data-i18n="dirLede">Every sekitori on the current banzuke — makuuchi and juryo — with the portrait the quiz draws from.</p>
+  </div>
+
+  <div class="toolbar">
+    <label class="search">
+      <span class="sr-only" data-i18n="searchLabel">Search</span>
+      <input type="search" id="search" autocomplete="off" data-i18n-placeholder="searchPlaceholder" placeholder="Search name, stable, birthplace…">
+    </label>
+    <div class="segmented" id="dirDivision" role="group">
+      <button type="button" class="segmented__btn is-active" data-division="all" data-i18n="divAll">All sekitori</button>
+      <button type="button" class="segmented__btn" data-division="Makuuchi" data-i18n="divMakuuchi">Makuuchi</button>
+      <button type="button" class="segmented__btn" data-division="Juryo" data-i18n="divJuryo">Juryo</button>
+    </div>
+    <label class="select">
+      <span class="sr-only" data-i18n="sortLabel">Sort</span>
+      <select id="sort">
+        <option value="rank" data-i18n="sortRank">By banzuke rank</option>
+        <option value="name" data-i18n="sortName">By name</option>
+        <option value="weight" data-i18n="sortWeight">By weight</option>
+        <option value="height" data-i18n="sortHeight">By height</option>
+        <option value="age" data-i18n="sortAge">By age</option>
+      </select>
+    </label>
+  </div>
+
+  <p class="result-count" id="resultCount"></p>
+  <ul class="roster" id="roster"></ul>
+  <p class="empty" id="empty" hidden data-i18n="noMatch">No rikishi answers to that name.</p>
+</main>
+
+<!-- ============ DETAIL PANEL ============ -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet__scrim" id="sheetScrim"></div>
+  <article class="sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetName">
+    <button type="button" class="sheet__close" id="sheetClose" aria-label="Close">×</button>
+    <div class="sheet__body" id="sheetBody"></div>
+  </article>
+</div>
+
+<footer class="footer">
+  <p data-i18n="footerCredit">Portraits &amp; profile data: Japan Sumo Association</p>
+  <p><a href="https://www.sumo.or.jp/" rel="noopener" target="_blank">www.sumo.or.jp</a></p>
+</footer>
+
+<script src="js/i18n.js"></script>
+<script src="js/data.js"></script>
+<script src="js/explore.js"></script>
+</body>
+</html>
