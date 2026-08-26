@@ -143,7 +143,7 @@
     var facts = document.createElement("ul");
     facts.className = "facts";
     [
-      [I18N.t("fHighest"), lang === "ja" ? rikishi.highestRankJa : rikishi.highestRankJa],
+      [I18N.t("fHighest"), SumoData.highestRank(rikishi, lang)],
       [I18N.t("fStable"), SumoData.stableOf(rikishi, lang)],
       [I18N.t("fRealName"), lang === "ja" ? rikishi.realNameJa : rikishi.realName],
       [I18N.t("fBirthday"), lang === "ja" ? rikishi.birthdayJa : birthdayEn(rikishi)],
@@ -151,7 +151,7 @@
       [I18N.t("fHeight"), rikishi.height],
       [I18N.t("fWeight"), rikishi.weight],
       [I18N.t("fTechnique"), lang === "ja" ? rikishi.techniqueJa : rikishi.technique],
-      [I18N.t("fDebut"), rikishi.debutJa]
+      [I18N.t("fDebut"), SumoData.debut(rikishi, lang)]
     ].forEach(function (pair) {
       var row = fact(pair[0], pair[1]);
       if (row) facts.appendChild(row);

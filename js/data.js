@@ -85,6 +85,63 @@
     return (lang === "ja" ? rikishi.birthplaceJa : rikishi.birthplace) || rikishi.birthplace || "";
   }
 
+
+  /* ---------- rendering the Japanese-only fields in English ---------- */
+
+  var KANJI_DIGITS = {
+    "〇": 0, "一": 1, "二": 2, "三": 3, "四": 4,
+    "五": 5, "六": 6, "七": 7, "八": 8, "九": 9
+  };
+
+  /** Kanji numerals below 100: 七 -> 7, 十一 -> 11, 三十 -> 30. */
+  function kanjiNumber(text) {
+    if (!text) return NaN;
+    if (text === "元") return 1;                       // 令和元年 is year 1
+    var tens = text.indexOf("十");
+    if (tens === -1) return KANJI_DIGITS[text];
+    var high = tens === 0 ? 1 : KANJI_DIGITS[text.slice(0, tens)];
+    var low = tens === text.length - 1 ? 0 : KANJI_DIGITS[text.slice(tens + 1)];
+    return high * 10 + low;
+  }
+
+  var RANK_TITLES = [
+    ["横綱", "Yokozuna"], ["大関", "Ozeki"], ["関脇", "Sekiwake"], ["小結", "Komusubi"],
+    ["前頭", "Maegashira"], ["十両", "Juryo"], ["幕下", "Makushita"],
+    ["三段目", "Sandanme"], ["序二段", "Jonidan"], ["序ノ口", "Jonokuchi"]
+  ];
+
+  /** "前頭七枚目" -> "Maegashira #7"; "十両筆頭" -> "Juryo #1". */
+  function highestRank(rikishi, lang) {
+    var raw = rikishi.highestRankJa || "";
+    if (lang === "ja" || !raw) return raw;
+    for (var i = 0; i < RANK_TITLES.length; i++) {
+      var title = RANK_TITLES[i][0];
+      if (raw.indexOf(title) !== 0) continue;
+      var rest = raw.slice(title.length);
+      if (!rest) return RANK_TITLES[i][1];
+      if (rest === "筆頭") return RANK_TITLES[i][1] + " #1";
+      var slot = rest.match(/^(.+)枚目$/);
+      var number = slot ? kanjiNumber(slot[1]) : NaN;
+      return RANK_TITLES[i][1] + (isNaN(number) ? "" : " #" + number);
+    }
+    return raw;
+  }
+
+  var ERA_BASE = { "明治": 1867, "大正": 1911, "昭和": 1925, "平成": 1988, "令和": 2018 };
+  var MONTHS = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+
+  /** "平成三十年一月場所" -> "January 2018". */
+  function debut(rikishi, lang) {
+    var raw = rikishi.debutJa || "";
+    if (lang === "ja" || !raw) return raw;
+    var parts = raw.match(/^(明治|大正|昭和|平成|令和)(.+?)年(.+?)月場所$/);
+    if (!parts) return raw;
+    var year = ERA_BASE[parts[1]] + kanjiNumber(parts[2]);
+    var month = MONTHS[kanjiNumber(parts[3]) - 1];
+    return isNaN(year) || !month ? raw : month + " " + year;
+  }
+
   function load() {
     return fetch(DATA_URL, { cache: "no-cache" })
       .then(function (response) {
@@ -107,6 +164,8 @@
     rankValue: rankValue,
     rankLabel: rankLabel,
     rankBadge: rankBadge,
+    highestRank: highestRank,
+    debut: debut,
     isTopRank: isTopRank,
     ageOf: ageOf,
     numberOf: numberOf,
